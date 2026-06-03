@@ -1,19 +1,18 @@
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH   = path.join(__dirname, '..', 'database.sqlite');
+const __dirname   = path.dirname(fileURLToPath(import.meta.url));
+const DB_PATH     = path.join(__dirname, '..', 'database.sqlite');
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
 
-// Ensure uploads directory exists
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-const db = new Database(DB_PATH);
+const db = new DatabaseSync(DB_PATH);
 
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+db.exec("PRAGMA journal_mode = WAL");
+db.exec("PRAGMA foreign_keys = ON");
 
 export const initDB = () => {
   db.exec(`
@@ -131,7 +130,7 @@ export const initDB = () => {
     );
   `);
 
-  console.log('SQLite database ready:', DB_PATH);
+  console.log('SQLite ready:', DB_PATH);
 };
 
 export default db;

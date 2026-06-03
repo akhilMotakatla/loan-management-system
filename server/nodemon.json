@@ -1,0 +1,8 @@
+{
+  "execMap": {
+    "js": "node --experimental-sqlite"
+  },
+  "watch": ["server.js", "config", "models", "controllers", "routes", "middleware", "services"],
+  "ext": "js,json",
+  "ignore": ["node_modules", "uploads", "database.sqlite*"]
+}
