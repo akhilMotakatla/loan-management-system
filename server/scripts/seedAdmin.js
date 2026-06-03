@@ -1,24 +1,30 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import '../config/db.js';         // ensures DB file + tables are created
+import { initDB } from '../config/db.js';
 import User from '../models/User.model.js';
+import dotenv from 'dotenv';
 
 dotenv.config();
+initDB();
 
 const seed = async () => {
-  await mongoose.connect(process.env.MONGO_URI);
-  const existing = await User.findOne({ role: 'admin' });
-  if (existing) { console.log('Admin already exists:', existing.email); process.exit(0); }
+  const existing = User.findOne({ email: 'admin@premierbank.com' });
+  if (existing) {
+    console.log('Admin already exists:', existing.email);
+    process.exit(0);
+  }
   const admin = await User.create({
-    firstName: 'Admin', lastName: 'User',
-    email: 'admin@premierbank.com',
-    password: 'Admin@1234',
-    phone: '1234567890',
-    role: 'admin',
-    isVerified: true,
-    kycStatus: 'verified',
+    firstName: 'Admin',
+    lastName:  'User',
+    email:     'admin@premierbank.com',
+    password:  'Admin@1234',
+    phone:     '1234567890',
+    role:      'admin',
   });
-  console.log('Admin created:', admin.email, '| Password: Admin@1234');
+  // Mark as verified
+  User.update(admin.id, { isVerified: 1, kycStatus: 'verified' });
+  console.log('Admin created:', admin.email);
+  console.log('Password: Admin@1234');
   process.exit(0);
 };
 
-seed().catch((err) => { console.error(err); process.exit(1); });
+seed().catch(err => { console.error(err); process.exit(1); });

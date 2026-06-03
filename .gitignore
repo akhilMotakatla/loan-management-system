@@ -15,5 +15,8 @@ Thumbs.db
 .idea/
 *.swp
 server/uploads/
+server/database.sqlite
+server/database.sqlite-shm
+server/database.sqlite-wal
 .cache/
 .eslintcache

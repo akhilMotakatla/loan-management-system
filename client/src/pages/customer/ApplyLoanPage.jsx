@@ -32,15 +32,46 @@ export default function ApplyLoanPage() {
     else    setForm(f => ({ ...f, [a]: val }));
   };
 
+  // Strip empty strings and coerce numeric strings before sending
+  const buildPayload = () => {
+    const toNum = (v) => (v === '' || v == null ? undefined : Number(v));
+    const toStr = (v) => (v === '' || v == null ? undefined : v);
+
+    const details = {
+      requestedAmount: Number(form.loanDetails.requestedAmount),
+      requestedTenure: Number(form.loanDetails.requestedTenure),
+      purpose:         form.loanDetails.purpose,
+      ...(form.loanDetails.collateral      && { collateral:      form.loanDetails.collateral }),
+      ...(form.loanDetails.propertyAddress && { propertyAddress: form.loanDetails.propertyAddress }),
+      ...(form.loanDetails.vehicleMake     && { vehicleMake:     form.loanDetails.vehicleMake }),
+      ...(form.loanDetails.vehicleModel    && { vehicleModel:    form.loanDetails.vehicleModel }),
+      ...(form.loanDetails.vehicleYear     && { vehicleYear:     Number(form.loanDetails.vehicleYear) }),
+    };
+
+    const snap = form.financialSnapshot;
+    const financialSnapshot = {
+      ...(toNum(snap.declaredIncome)  != null && { declaredIncome:  toNum(snap.declaredIncome) }),
+      ...(toNum(snap.existingLoans)   != null && { existingLoans:   toNum(snap.existingLoans) }),
+      ...(toNum(snap.monthlyExpenses) != null && { monthlyExpenses: toNum(snap.monthlyExpenses) }),
+      ...(toNum(snap.creditScore)     != null && { creditScore:     toNum(snap.creditScore) }),
+    };
+
+    return { loanType: form.loanType, loanDetails: details, financialSnapshot };
+  };
+
   const submit = async () => {
     setLoading(true);
     try {
-      const payload = { ...form, loanDetails: { ...form.loanDetails, requestedAmount: Number(form.loanDetails.requestedAmount), requestedTenure: Number(form.loanDetails.requestedTenure) } };
+      const payload = buildPayload();
       const { data } = await api.post('/applications', payload);
-      await api.post(`/applications/${data.data._id}/submit`);
+      const appId = data.data._id || data.data.id;
+      await api.post(`/applications/${appId}/submit`);
       toast.success('Application submitted successfully!');
       navigate('/applications');
-    } catch (e) { toast.error(e.response?.data?.message || 'Submission failed'); }
+    } catch (e) {
+      const msg = e.response?.data?.errors?.join(', ') || e.response?.data?.message || 'Submission failed';
+      toast.error(msg);
+    }
     setLoading(false);
   };
 
