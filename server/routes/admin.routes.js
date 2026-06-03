@@ -1,0 +1,22 @@
+import { Router } from 'express';
+import * as admin from '../controllers/admin.controller.js';
+import { verifyJWT } from '../middleware/auth.middleware.js';
+import { requireAdmin } from '../middleware/admin.middleware.js';
+
+const router = Router();
+router.use(verifyJWT, requireAdmin);
+router.get('/dashboard', admin.getDashboard);
+router.get('/applications', admin.getAllApplications);
+router.get('/applications/:id', admin.getApplicationDetail);
+router.put('/applications/:id/approve', admin.approveApplication);
+router.put('/applications/:id/reject', admin.rejectApplication);
+router.put('/applications/:id/request-docs', admin.requestDocs);
+router.post('/applications/:id/disburse', admin.disburseApplication);
+router.get('/loans', admin.getAllLoans);
+router.get('/users', admin.getAllUsers);
+router.get('/users/:id', admin.getUserDetail);
+router.put('/users/:id/kyc', admin.updateUserKYC);
+router.put('/users/:id/role', admin.updateUserRole);
+router.put('/documents/:id/verify', admin.verifyDocument);
+router.get('/reports/summary', admin.getReports);
+export default router;

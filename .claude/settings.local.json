@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\22akh\\\\OneDrive\\\\Desktop\\\\Loan Managemnt System\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(ls \"C:\\\\Users\\\\22akh\\\\OneDrive\\\\Desktop\")"
+    ]
+  }
+}
